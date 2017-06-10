@@ -4,10 +4,11 @@
             [redux-demo.view.request-joke :refer [request-joke]]))
 
 (defn header []
-  [:h1 "Reagent Redux Demo"])
+  [:h1 "Reagent Nodux Demo"])
 
 (defn app []
-  [:div
-   [header]
-   [joke-list store]
-   [request-joke store]])
+  (let [props @store]
+    [:div
+     [header]
+     [joke-list props]
+     [request-joke props]]))

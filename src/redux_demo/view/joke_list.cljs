@@ -12,7 +12,7 @@
    [:button {:on-click #(delete-joke index)}
     "Delete"]])
 
-(defn disconnected-joke-list [{:keys [delete-joke jokes]}]
+(defn joke-list [{:keys [::actions/delete-joke ::state/jokes]}]
   (if (seq jokes)
     [:ul
      (map-indexed
@@ -20,15 +20,3 @@
         (joke-entry index joke delete-joke))
       jokes)]
     [:p "No jokes there (yet)"]))
-
-(defn state->list-props [state]
-  {:jokes (:jokes state)})
-
-(defn dispatch->list-props [dispatch]
-  {:delete-joke (fn [index]
-                  (dispatch (actions/delete-joke index)))})
-
-(def joke-list
-  (redux/connect {:state->props state->list-props
-                  :dispatch->props dispatch->list-props}
-                 disconnected-joke-list))

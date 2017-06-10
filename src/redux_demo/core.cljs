@@ -1,27 +1,17 @@
 (ns redux-demo.core
-  (:require [reagent.core :as reagent]))
+  (:require [reagent.core :as reagent]
+            [redux-demo.util :refer [map-vals]]))
 
-(defn connect [{:keys [state->props dispatch->props]} component]
-  (fn [{:keys [::state ::reducer]}]
-    (let [dispatch (fn dispatch [event-or-fn]
-                     (if (map? event-or-fn)
-                       (swap! state reducer event-or-fn))
-                     (event-or-fn dispatch state))
-          props (merge
-                 (when state->props
-                   (state->props @state))
-                 (when dispatch->props
-                   (dispatch->props dispatch)))]
-      [component props])))
+(defn transform-handler [store handler]
+  (fn [& args]
+    (apply swap! store handler args)))
 
-(defn combine-reducers [reducer-map]
-  (fn [state event]
-    (->> reducer-map
-         (map (fn [[k reducer]]
-                [k (reducer (get state k)
-                            event)]))
-         (into {}))))
+(defn transform-handlers [store handlers]
+  (map-vals (partial transform-handler store)
+            handlers))
 
-(defn create-store [reducer]
-  {::state (reagent/atom {})
-   ::reducer reducer})
+(defn create-store [init-state handlers]
+  (let [store (reagent/atom init-state)
+        handlers (transform-handlers store handlers)]
+    (swap! store merge handlers)
+    store))

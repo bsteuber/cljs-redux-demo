@@ -3,7 +3,7 @@
             [redux-demo.actions :as actions]
             [redux-demo.core :as redux]))
 
-(defn disconnected-request-joke [{:keys [request-joke]}]
+(defn request-joke [{:keys [::actions/request-joke]}]
   (let [state (reagent/atom "")
         on-submit (fn []
                     (let [parsed (js/parseInt @state)]
@@ -20,11 +20,3 @@
                                                .-value)))}]
        [:button {:on-click on-submit}
         "Request Joke with this id"]])))
-
-(defn dispatch->request-props [dispatch]
-  {:request-joke (fn [index]
-                   (dispatch (actions/request-joke index)))})
-
-(def request-joke
-  (redux/connect {:dispatch->props dispatch->request-props}
-                 disconnected-request-joke))
